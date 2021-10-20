@@ -8,8 +8,7 @@ import java.util.*
 @Parcelize
 class Album(var titulo: String): Parcelable, Serializable {
     val fotos: ArrayList<Foto> = arrayListOf()
-    // Fecha que se usa para la ultima modificacion
-    var fechaUltimaModif: Long = Date().time
+
     /**
      * Agrega una foto al album
      */
