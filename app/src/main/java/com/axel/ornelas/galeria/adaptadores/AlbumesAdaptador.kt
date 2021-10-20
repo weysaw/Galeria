@@ -13,8 +13,8 @@ import android.view.ContextMenu.ContextMenuInfo
 /**
  * https://newbedev.com/how-to-create-context-menu-for-recyclerview
  */
-class AlbumAdaptador(private val localDataSet: ArrayList<Album>, private val menuInflater: MenuInflater) :
-    RecyclerView.Adapter<AlbumAdaptador.ViewHolder>() {
+class AlbumesAdaptador(private val localDataSet: ArrayList<Album>, private val menuInflater: MenuInflater) :
+    RecyclerView.Adapter<AlbumesAdaptador.ViewHolder>() {
 
     //Tal vez se deba poner protected
     lateinit var onClickListener: View.OnClickListener
