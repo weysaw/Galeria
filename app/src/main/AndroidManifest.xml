@@ -10,7 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Galeria">
         <activity
-            android:name="com.axel.ornelas.galeria.actividades.MainActivity"
+            android:name=".actividades.AlbumFotos"
+            android:exported="false"
+            android:parentActivityName=".actividades.MainActivity"/>
+        <activity
+            android:name=".actividades.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
