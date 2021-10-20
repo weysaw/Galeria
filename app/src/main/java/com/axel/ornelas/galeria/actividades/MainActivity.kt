@@ -2,8 +2,10 @@ package com.axel.ornelas.galeria.actividades
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.InputType
 import android.view.MenuItem
 import android.view.View
@@ -12,12 +14,18 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.axel.ornelas.galeria.Album
 import com.axel.ornelas.galeria.R
-import com.axel.ornelas.galeria.adaptadores.AlbumAdaptador
+import com.axel.ornelas.galeria.adaptadores.AlbumesAdaptador
 import com.axel.ornelas.galeria.databinding.ActivityMainBinding
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.lang.Exception
 
+/**
+ *
+ *
+ * https://www.youtube.com/watch?v=HMjI7cLsyfw
+ * https://proandroiddev.com/serializable-or-parcelable-why-and-which-one-17b274f3d3bb
+ */
 class MainActivity : AppCompatActivity() {
 
     private var albumes: ArrayList<Album> = arrayListOf()
@@ -32,17 +40,30 @@ class MainActivity : AppCompatActivity() {
         binding.albumes.layoutManager = GridLayoutManager(this, 2)
         leerArchivoAlbumes()
         // Se crea un adaptador con el arreglo
-        val adapter = AlbumAdaptador(albumes, menuInflater)
+        val adapter = AlbumesAdaptador(albumes, menuInflater)
         // Se colocan las peliculas en el adaptador
         binding.albumes.adapter = adapter
         adapter.onClickListener = View.OnClickListener { v ->
             val pos: Int = binding.albumes.getChildAdapterPosition(v)
-            Toast.makeText(this, pos.toString(), Toast.LENGTH_SHORT).show()
-            /*val intent = Intent(this, InformacionPelicula::class.java)
-            intent.putExtra("pelicula", pelis[pos])
-            startActivity(intent)*/
+            val intent = Intent(this, AlbumFotos::class.java)
+            intent.putExtra("album", albumes[pos] as Parcelable)
+            startActivity(intent)
         }
         registerForContextMenu(binding.albumes)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.eliminarAlbum -> {
+                confirmarEliminacion()
+                true
+            }
+            R.id.modificarAlbum -> {
+                modificarAlbum()
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
     }
 
     /**
@@ -69,19 +90,6 @@ class MainActivity : AppCompatActivity() {
             .create().show()
     }
 
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.eliminarAlbum -> {
-                confirmarEliminacion()
-                true
-            }
-            R.id.modificarAlbum -> {
-                modificarAlbum()
-                true
-            }
-            else -> super.onContextItemSelected(item)
-        }
-    }
 
     /**
      * Modifica el nombre del album
@@ -97,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                 val nombreAlbum: String = albumTitulo.text.toString()
                 if (!verificarNombreAlbum(nombreAlbum)) return@setPositiveButton
                 //Agrega el nuevo album
-                val adaptador = (binding.albumes.adapter as AlbumAdaptador)
+                val adaptador = (binding.albumes.adapter as AlbumesAdaptador)
                 val pos: Int = adaptador.pos
                 albumes[pos].titulo = nombreAlbum
                 adaptador.notifyItemChanged(pos)
@@ -161,7 +169,7 @@ class MainActivity : AppCompatActivity() {
      * Muesta un dialogo en el que pregunta si quiere eliminar el album
      */
     private fun confirmarEliminacion() {
-        val adaptador = (binding.albumes.adapter as AlbumAdaptador)
+        val adaptador = (binding.albumes.adapter as AlbumesAdaptador)
         val pos: Int = adaptador.pos
         obtenerDialogo(
             "¿Esta seguro que quiere borrar el album de ${albumes[pos].titulo}?",
