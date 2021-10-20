@@ -3,7 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Directorios/Documentos/Android-Proyectos/Galeria/app/src/main/res/drawable/folder.xml" value="0.37864583333333335" />
+        <entry key="..\:/Directorios/Documentos/Android-Proyectos/Galeria/app/src/main/res/drawable/ic_baseline_add_circle_24.xml" value="0.37864583333333335" />
         <entry key="..\:/Directorios/Documentos/Android-Proyectos/Galeria/app/src/main/res/layout/activity_main.xml" value="0.3625" />
+        <entry key="..\:/Directorios/Documentos/Android-Proyectos/Galeria/app/src/main/res/layout/album.xml" value="0.2659846547314578" />
+        <entry key="..\:/Directorios/Documentos/Android-Proyectos/Galeria/app/src/main/res/menu/opciones_album.xml" value="0.3625" />
       </map>
     </option>
   </component>
