@@ -3,9 +3,9 @@ package com.axel.ornelas.galeria.actividades
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.InputType
 import android.view.MenuItem
 import android.view.View
@@ -20,6 +20,8 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.lang.Exception
 
+private const val nombreArchivo = "albumes"
+
 /**
  *
  *
@@ -29,27 +31,42 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
 
     private var albumes: ArrayList<Album> = arrayListOf()
+    private lateinit var adapter: AlbumesAdaptador
     private lateinit var binding: ActivityMainBinding
-    private val nombreArchivo = "albumes"
+    private var albumCambiado = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // Se le indica el layout al reclycler
-        binding.albumes.layoutManager = GridLayoutManager(this, 2)
-        leerArchivoAlbumes()
         // Se crea un adaptador con el arreglo
-        val adapter = AlbumesAdaptador(albumes, menuInflater)
+        adapter = AlbumesAdaptador(albumes, menuInflater)
+        // Se le indica el layout al reclycler
+        binding.albumes.layoutManager =
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                GridLayoutManager(this, 3)
+            else
+                GridLayoutManager(this, 2)
         // Se colocan las peliculas en el adaptador
         binding.albumes.adapter = adapter
         adapter.onClickListener = View.OnClickListener { v ->
             val pos: Int = binding.albumes.getChildAdapterPosition(v)
             val intent = Intent(this, AlbumFotos::class.java)
-            intent.putExtra("album", albumes[pos] as Parcelable)
+            intent.putExtra("albumes", albumes)
+            intent.putExtra("pos", pos)
             startActivity(intent)
+            albumCambiado = pos
         }
         registerForContextMenu(binding.albumes)
+    }
+
+    /**
+     * Cuando se resume la actividad actualiza las portadas de los albumes
+     */
+    override fun onResume() {
+        leerArchivoAlbumes()
+        adapter.notifyItemChanged(albumCambiado)
+        super.onResume()
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -81,6 +98,7 @@ class MainActivity : AppCompatActivity() {
                 if (!verificarNombreAlbum(nombreAlbum)) return@setPositiveButton
                 //Agrega el nuevo album
                 albumes += Album(nombreAlbum)
+                adapter.notifyItemInserted(albumes.size - 1)
                 guardarAlbumes()
             }
             .setNegativeButton("Cancelar") { dialog, _ ->
@@ -105,10 +123,9 @@ class MainActivity : AppCompatActivity() {
                 val nombreAlbum: String = albumTitulo.text.toString()
                 if (!verificarNombreAlbum(nombreAlbum)) return@setPositiveButton
                 //Agrega el nuevo album
-                val adaptador = (binding.albumes.adapter as AlbumesAdaptador)
-                val pos: Int = adaptador.pos
+                val pos: Int = adapter.pos
                 albumes[pos].titulo = nombreAlbum
-                adaptador.notifyItemChanged(pos)
+                adapter.notifyItemChanged(pos)
                 guardarAlbumes()
             }
             .setNegativeButton("Cancelar") { dialog, _ ->
@@ -122,15 +139,24 @@ class MainActivity : AppCompatActivity() {
      * Verifica si el nombre es valido
      */
     private fun verificarNombreAlbum(nombreAlbum: String): Boolean {
-        if (nombreAlbum.contains(",")) {
-            Toast.makeText(
-                applicationContext,
-                "El nombre no debe contener \",\"",
-                Toast.LENGTH_SHORT
-            ).show()
-            return false
+        val toast = Toast.makeText(
+            applicationContext,
+            "El nombre no debe estar vacio",
+            Toast.LENGTH_SHORT
+        )
+        return when {
+            nombreAlbum.isBlank() || nombreAlbum.isEmpty() -> {
+                toast.show()
+                false
+            }
+            albumes.any { album -> album.titulo == nombreAlbum } -> {
+                toast.setText("El nombre de este album ya existe")
+                toast.show()
+                false
+            }
+            else -> true
         }
-        return true
+
     }
 
     /**
@@ -144,6 +170,7 @@ class MainActivity : AppCompatActivity() {
                 obInputS.close()
                 it.close()
             }
+            adapter.localDataSet = albumes
         } catch (ex: Exception) {
             println("\n\nArchivo no encontrado\n\n")
         }
@@ -169,8 +196,7 @@ class MainActivity : AppCompatActivity() {
      * Muesta un dialogo en el que pregunta si quiere eliminar el album
      */
     private fun confirmarEliminacion() {
-        val adaptador = (binding.albumes.adapter as AlbumesAdaptador)
-        val pos: Int = adaptador.pos
+        val pos: Int = adapter.pos
         obtenerDialogo(
             "¿Esta seguro que quiere borrar el album de ${albumes[pos].titulo}?",
             "Eliminar Albumes"
@@ -178,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Eliminar") { _, _ ->
                 //Se remueve el album y se notifica al recycler view
                 albumes.removeAt(pos)
-                adaptador.notifyItemRemoved(pos)
+                adapter.notifyItemRemoved(pos)
                 // Se guardan los cambios
                 guardarAlbumes()
             }
