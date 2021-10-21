@@ -1,6 +1,7 @@
 package com.axel.ornelas.galeria.adaptadores
 
 
+import android.content.Context
 import android.net.Uri
 import android.view.*
 import android.widget.ImageView
@@ -9,23 +10,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.axel.ornelas.galeria.Album
 import com.axel.ornelas.galeria.R
 import android.view.ContextMenu.ContextMenuInfo
+import com.bumptech.glide.Glide
 
 /**
  * https://newbedev.com/how-to-create-context-menu-for-recyclerview
+ * https://bumptech.github.io/glide/doc/options.html
  */
-class AlbumesAdaptador(private val localDataSet: ArrayList<Album>, private val menuInflater: MenuInflater) :
+class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInflater: MenuInflater) :
     RecyclerView.Adapter<AlbumesAdaptador.ViewHolder>() {
 
+    private lateinit var contexto: Context
     //Tal vez se deba poner protected
     lateinit var onClickListener: View.OnClickListener
     var pos: Int = 0
         private set
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
+        contexto = parent.context
         //Indica el estilo que debe tener el recycler
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.album, parent, false)
+        val view = LayoutInflater.from(contexto).inflate(R.layout.album, parent, false)
         view.setOnClickListener(onClickListener)
         //Devuelve la vista creada
         return ViewHolder(view)
@@ -34,16 +40,22 @@ class AlbumesAdaptador(private val localDataSet: ArrayList<Album>, private val m
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         //Coloca la información de las peliculas a los campos de texto
         with(localDataSet[position].fotos) {
-            if (this.isEmpty())
-                holder.imagen.setImageResource(R.drawable.folder)
-            else {
-                val direccion: Uri = localDataSet[position].fotos[0].direccionUri
-                holder.imagen.setImageURI(direccion)
+            if (this.isEmpty()) {
+                Glide.with(contexto)
+                    .load(R.drawable.folder)
+                    .centerCrop()
+                    .into(holder.imagen)
+            } else {
+                val direccion: Uri = Uri.parse(localDataSet[position].fotos[0].direccionUri)
+                Glide.with(contexto)
+                    .load(direccion)
+                    .centerCrop()
+                    .into(holder.imagen)
             }
         }
         holder.titulo.text = localDataSet[position].titulo
         holder.itemView.setOnLongClickListener {
-            pos = position
+            pos = holder.adapterPosition
             false
         }
     }
