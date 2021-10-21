@@ -1,4 +1,4 @@
-package com.axel.ornelas.Galeria
+package com.axel.ornelas.galeria
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

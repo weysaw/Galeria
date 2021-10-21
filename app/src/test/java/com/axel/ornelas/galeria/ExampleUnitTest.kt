@@ -1,4 +1,4 @@
-package com.axel.ornelas.Galeria
+package com.axel.ornelas.galeria
 
 import org.junit.Test
 
