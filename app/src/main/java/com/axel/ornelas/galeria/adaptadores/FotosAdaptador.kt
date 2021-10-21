@@ -1,21 +1,24 @@
 package com.axel.ornelas.galeria.adaptadores
 
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.net.Uri
 import android.view.*
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.axel.ornelas.galeria.Album
 import com.axel.ornelas.galeria.R
 import android.view.ContextMenu.ContextMenuInfo
+import com.bumptech.glide.Glide
 
 /**
  * https://newbedev.com/how-to-create-context-menu-for-recyclerview
+ * https://bumptech.github.io/glide/doc/options.html
  */
 class FotosAdaptador(private val localDataSet: Album, private val menuInflater: MenuInflater?) :
     RecyclerView.Adapter<FotosAdaptador.ViewHolder>() {
 
-    //Tal vez se deba poner protected
+    private lateinit var contexto: Context
     lateinit var onClickListener: View.OnClickListener
     var pos: Int = 0
         private set
@@ -24,23 +27,28 @@ class FotosAdaptador(private val localDataSet: Album, private val menuInflater: 
         viewType: Int
     ): ViewHolder {
         //Indica el estilo que debe tener el recycler
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.foto, parent, false)
+        contexto = parent.context
+        val view = LayoutInflater.from(contexto).inflate(R.layout.foto, parent, false)
         view.setOnClickListener(onClickListener)
         //Devuelve la vista creada
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val foto = localDataSet.fotos[position]
-        holder.imagen.setImageURI(foto.direccionUri)
+        val direccion = Uri.parse(foto.direccionUri)
+        Glide.with(contexto)
+            .load(direccion)
+            .fitCenter()
+            .into(holder.imagen)
         holder.itemView.setOnLongClickListener {
-            pos = position
+            pos = holder.adapterPosition
             false
         }
     }
 
     /**
-     *
+     * Accion por defecto cuando se presiona mucho tiempo
      */
     override fun onViewRecycled(holder: ViewHolder) {
         holder.itemView.setOnLongClickListener(null)
@@ -66,7 +74,5 @@ class FotosAdaptador(private val localDataSet: Album, private val menuInflater: 
             menuInflater?.inflate(R.menu.opciones_foto, menu)
             menu?.setHeaderTitle("Opciones Menu")
         }
-
-
     }
 }
