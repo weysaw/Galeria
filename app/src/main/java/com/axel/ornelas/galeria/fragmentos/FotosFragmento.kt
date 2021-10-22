@@ -39,7 +39,7 @@ class FotosFragmento : Fragment() {
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             //Verifica si hay un dato repetido
             if (album.fotos.any { foto -> foto.direccionUri == uri.toString() }) {
-                println("Dato repetido")
+                Toast.makeText(requireContext(), "Foto Repetida", Toast.LENGTH_SHORT).show()
                 return@registerForActivityResult
             }
             //Garantiza que se pueda abrir la imagen en otra actividad
@@ -50,7 +50,6 @@ class FotosFragmento : Fragment() {
             )
             agregarFoto(uri.toString())
         }
-
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -72,20 +71,24 @@ class FotosFragmento : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentFotosFragmentoBinding.inflate(inflater, container, false)
-        registerForContextMenu(binding.fotosRecycler)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         // Obtiene los parametros
         arguments.let {
             albumes = it?.getSerializable(ARG_PARAM1) as ArrayList<Album>
-            val pos = it.getInt(ARG_PARAM2)
-            album = albumes[pos]
+            val posAlbum = it.getInt(ARG_PARAM2)
+            album = albumes[posAlbum]
         }
-        adapter = FotosAdaptador(album, activity?.menuInflater)
+        adapter = FotosAdaptador(album, requireActivity().menuInflater)
         // Se colocan las peliculas en el adaptador
         binding.fotosRecycler.layoutManager = GridLayoutManager(activity, 3)
         binding.fotosRecycler.adapter = adapter
 
         adapter.onClickListener = View.OnClickListener { v ->
-            val pos: Int = binding.fotosRecycler.getChildAdapterPosition(v)
+            val pos = binding.fotosRecycler.getChildAdapterPosition(v)
             when (resources.configuration.orientation) {
                 Configuration.ORIENTATION_LANDSCAPE -> {
                     //Muestra la foto en el 2do fragmento
@@ -103,9 +106,8 @@ class FotosFragmento : Fragment() {
         binding.floatingActionButton.setOnClickListener {
             obtenerFoto()
         }
-        return binding.root
+        registerForContextMenu(binding.fotosRecycler)
     }
-
 
     /**
      * Agrega la foto a los albumes
@@ -141,7 +143,7 @@ class FotosFragmento : Fragment() {
         editDescripcion.text.insert(0, foto.descripcion)
         editDescripcion.inputType = InputType.TYPE_CLASS_TEXT
 
-        obtenerDialogo("Ingrese la descripción nueva de la imagen", "Agregar Imagen")
+        obtenerDialogo("Ingrese la descripción nueva de la foto", "Modificar Foto")
             .setPositiveButton("Modificar") { _, _ ->
                 val descripcion = editDescripcion.text.toString()
                 //Modifica la descripcion de la foto
@@ -201,9 +203,8 @@ class FotosFragmento : Fragment() {
     private fun eliminarFoto() {
         val pos: Int = adapter.pos
         obtenerDialogo(
-            "¿Esta seguro que quiere borrar el album de ${albumes[pos].titulo}?",
-            "Eliminar Albumes"
-        )
+            "¿Esta seguro que quiere borrar la foto \"${album.fotos[pos].descripcion}\"?",
+            "Eliminar Albumes")
             .setPositiveButton("Eliminar") { _, _ ->
                 //Se remueve el album y se notifica al recycler view
                 album.removerFoto(pos)
