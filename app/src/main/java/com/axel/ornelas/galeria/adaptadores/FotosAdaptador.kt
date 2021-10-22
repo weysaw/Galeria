@@ -41,7 +41,6 @@ class FotosAdaptador(private val localDataSet: Album, private val menuInflater: 
             .load(direccion)
             .fitCenter()
             .into(holder.imagen)
-        //SE BORRA
         holder.itemView.setOnLongClickListener {
             pos = holder.adapterPosition
             false

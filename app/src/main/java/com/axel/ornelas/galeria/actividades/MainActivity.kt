@@ -89,10 +89,10 @@ class MainActivity : AppCompatActivity() {
      */
     fun agregarAlbum(v: View) {
         val albumTitulo = EditText(this)
-        albumTitulo.hint = "Nombre Album"
+        albumTitulo.hint = "Nombre Álbum"
         albumTitulo.inputType = InputType.TYPE_CLASS_TEXT
         //Crea el dialogo
-        obtenerDialogo("Ingrese el titulo del nuevo album", "Nuevo Album")
+        obtenerDialogo("Ingrese el titulo del nuevo álbum", "Nuevo Älbum")
             .setPositiveButton("Crear") { _, _ ->
                 // Se obtiene el nombre del album
                 val nombreAlbum: String = albumTitulo.text.toString()
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         albumTitulo.hint = "Nuevo Nombre Album"
         albumTitulo.inputType = InputType.TYPE_CLASS_TEXT
         //Crea el dialogo
-        obtenerDialogo("Ingrese el titulo nuevo del album", "Modificar Album")
+        obtenerDialogo("Ingrese el titulo nuevo del álbum", "Modificar Álbum")
             .setPositiveButton("Crear") { _, _ ->
                 // Se obtiene el nombre del album
                 val nombreAlbum: String = albumTitulo.text.toString()
@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun confirmarEliminacion() {
         obtenerDialogo(
-            "¿Esta seguro que quiere borrar el album \"${albumes[adapter.pos].titulo}\"?",
+            "¿Esta seguro que quiere borrar el álbum \"${albumes[adapter.pos].titulo}\"?",
             "Eliminar Albumes"
         )
             .setPositiveButton("Eliminar") { _, _ ->

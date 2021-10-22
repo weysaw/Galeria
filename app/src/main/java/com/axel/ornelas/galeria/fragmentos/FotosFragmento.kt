@@ -39,7 +39,7 @@ class FotosFragmento : Fragment() {
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             //Verifica si hay un dato repetido
             if (album.fotos.any { foto -> foto.direccionUri == uri.toString() }) {
-                println("Dato repetido")
+                Toast.makeText(requireContext(), "Foto Repetida", Toast.LENGTH_SHORT).show()
                 return@registerForActivityResult
             }
             //Garantiza que se pueda abrir la imagen en otra actividad
@@ -203,7 +203,7 @@ class FotosFragmento : Fragment() {
     private fun eliminarFoto() {
         val pos: Int = adapter.pos
         obtenerDialogo(
-            "¿Esta seguro que quiere borrar el album ${album.fotos[pos].descripcion}?",
+            "¿Esta seguro que quiere borrar la foto \"${album.fotos[pos].descripcion}\"?",
             "Eliminar Albumes")
             .setPositiveButton("Eliminar") { _, _ ->
                 //Se remueve el album y se notifica al recycler view

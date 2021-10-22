@@ -83,7 +83,7 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
         }
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
             menuInflater.inflate(R.menu.opciones_album, menu)
-            menu?.setHeaderTitle("Opciones Album")
+            menu?.setHeaderTitle("Opciones Älbum")
         }
 
 
