@@ -4,8 +4,8 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import com.axel.ornelas.galeria.Album
 import com.axel.ornelas.galeria.R
 import com.axel.ornelas.galeria.databinding.ActivityAlbumFotosBinding
@@ -42,14 +42,15 @@ class AlbumFotos : AppCompatActivity() {
             Configuration.ORIENTATION_LANDSCAPE -> {
                 //Agrega los 2 fragmentos con las imagenes, otro que muestra cual esta viendo
                 supportFragmentManager.commit {
-                    add<FotosFragmento>(R.id.albumFotoFragmento, args = bundle)
-                    add<MostrarFotoFragmento>(R.id.mostrarFotoLand)
+                    setReorderingAllowed(true)
+                    replace<FotosFragmento>(R.id.albumFotoFragmento, args = bundle)
+                    replace<MostrarFotoFragmento>(R.id.mostrarFotoLand)
                 }
             }//Cuando esta en portrait
             else -> {
                 supportFragmentManager.commit {
                     setReorderingAllowed(true)
-                    add<FotosFragmento>(R.id.albumFotoFragmento, args = bundle)
+                    replace<FotosFragmento>(R.id.albumFotoFragmento, args = bundle)
                 }
             }
         }

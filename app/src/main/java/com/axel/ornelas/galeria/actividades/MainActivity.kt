@@ -24,7 +24,6 @@ private const val nombreArchivo = "albumes"
 
 /**
  *
- *
  * https://www.youtube.com/watch?v=HMjI7cLsyfw
  * https://proandroiddev.com/serializable-or-parcelable-why-and-which-one-17b274f3d3bb
  */
@@ -33,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private var albumes: ArrayList<Album> = arrayListOf()
     private lateinit var adapter: AlbumesAdaptador
     private lateinit var binding: ActivityMainBinding
-    private var albumCambiado = 0
+    private var actualizarAlbum = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,12 +49,11 @@ class MainActivity : AppCompatActivity() {
         // Se colocan las peliculas en el adaptador
         binding.albumes.adapter = adapter
         adapter.onClickListener = View.OnClickListener { v ->
-            val pos: Int = binding.albumes.getChildAdapterPosition(v)
+            actualizarAlbum = binding.albumes.getChildAdapterPosition(v)
             val intent = Intent(this, AlbumFotos::class.java)
             intent.putExtra("albumes", albumes)
-            intent.putExtra("pos", pos)
+            intent.putExtra("pos", actualizarAlbum)
             startActivity(intent)
-            albumCambiado = pos
         }
         registerForContextMenu(binding.albumes)
     }
@@ -65,10 +63,13 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onResume() {
         leerArchivoAlbumes()
-        adapter.notifyItemChanged(albumCambiado)
+        adapter.notifyItemChanged(actualizarAlbum)
         super.onResume()
     }
 
+    /**
+     * Opciones del album cuando se deja presionado
+     */
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.eliminarAlbum -> {
@@ -86,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Agrega un album presionando el boton inferior
      */
-    fun agregarAlbum(view: View) {
+    fun agregarAlbum(v: View) {
         val albumTitulo = EditText(this)
         albumTitulo.hint = "Nombre Album"
         albumTitulo.inputType = InputType.TYPE_CLASS_TEXT
@@ -105,7 +106,8 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .setView(albumTitulo)
-            .create().show()
+            .create()
+            .show()
     }
 
 
@@ -113,7 +115,9 @@ class MainActivity : AppCompatActivity() {
      * Modifica el nombre del album
      */
     private fun modificarAlbum() {
+        val album = albumes[adapter.pos]
         val albumTitulo = EditText(this)
+        albumTitulo.text.insert(0, album.titulo)
         albumTitulo.hint = "Nuevo Nombre Album"
         albumTitulo.inputType = InputType.TYPE_CLASS_TEXT
         //Crea el dialogo
@@ -122,10 +126,8 @@ class MainActivity : AppCompatActivity() {
                 // Se obtiene el nombre del album
                 val nombreAlbum: String = albumTitulo.text.toString()
                 if (!verificarNombreAlbum(nombreAlbum)) return@setPositiveButton
-                //Agrega el nuevo album
-                val pos: Int = adapter.pos
-                albumes[pos].titulo = nombreAlbum
-                adapter.notifyItemChanged(pos)
+                album.titulo = nombreAlbum
+                adapter.notifyItemChanged(adapter.pos)
                 guardarAlbumes()
             }
             .setNegativeButton("Cancelar") { dialog, _ ->
@@ -196,22 +198,22 @@ class MainActivity : AppCompatActivity() {
      * Muesta un dialogo en el que pregunta si quiere eliminar el album
      */
     private fun confirmarEliminacion() {
-        val pos: Int = adapter.pos
         obtenerDialogo(
-            "¿Esta seguro que quiere borrar el album de ${albumes[pos].titulo}?",
+            "¿Esta seguro que quiere borrar el album \"${albumes[adapter.pos].titulo}\"?",
             "Eliminar Albumes"
         )
             .setPositiveButton("Eliminar") { _, _ ->
                 //Se remueve el album y se notifica al recycler view
-                albumes.removeAt(pos)
-                adapter.notifyItemRemoved(pos)
+                albumes.removeAt(adapter.pos)
+                adapter.notifyItemRemoved(adapter.pos)
                 // Se guardan los cambios
                 guardarAlbumes()
             }
             .setNegativeButton("Cancelar") { dialog, _ ->
                 dialog.dismiss()
             }
-            .create().show()
+            .create()
+            .show()
     }
 
     /**

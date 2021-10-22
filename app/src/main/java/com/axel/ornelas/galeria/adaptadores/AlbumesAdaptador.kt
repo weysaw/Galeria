@@ -22,7 +22,8 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
     private lateinit var contexto: Context
     //Tal vez se deba poner protected
     lateinit var onClickListener: View.OnClickListener
-    var pos: Int = 0
+
+    var pos = 0
         private set
 
     override fun onCreateViewHolder(
@@ -33,6 +34,7 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
         //Indica el estilo que debe tener el recycler
         val view = LayoutInflater.from(contexto).inflate(R.layout.album, parent, false)
         view.setOnClickListener(onClickListener)
+        //view.setOnLongClickListener(onLongClickListener)
         //Devuelve la vista creada
         return ViewHolder(view)
     }
@@ -60,10 +62,6 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
         }
     }
 
-    override fun onViewRecycled(holder: ViewHolder) {
-        holder.itemView.setOnLongClickListener(null)
-        super.onViewRecycled(holder)
-    }
     /**
      * Tamaño de los datos
      */
@@ -76,6 +74,7 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
      */
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnCreateContextMenuListener {
+
         val imagen: ImageView = itemView.findViewById(R.id.fotoAlbum)
         val titulo: TextView = itemView.findViewById(R.id.tituloAlbum)
 
@@ -84,7 +83,7 @@ class AlbumesAdaptador(var localDataSet: ArrayList<Album>, private val menuInfla
         }
         override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenuInfo?) {
             menuInflater.inflate(R.menu.opciones_album, menu)
-            menu?.setHeaderTitle("Opciones Menu")
+            menu?.setHeaderTitle("Opciones Album")
         }
 
 
